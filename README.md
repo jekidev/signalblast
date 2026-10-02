@@ -73,3 +73,16 @@ The `docker/compose_build.sh` and `docker/compose_up.sh` are provide for easier 
 
 * Make instructions clearer and add pictures to the readme
 * Add unit testing
+
+
+## Signal group administration launcher
+
+This fork includes a menu-driven launcher for Signalblast administration.
+
+Start it with `python3 launcher.py`. Set `SIGNAL_NUMBER` in the environment first, or enter the account when prompted.
+
+The launcher provides diagnostics, dependency/bootstrap setup, group listing, group membership export, review-based invitations, bot startup, and log viewing. It prefers a native `signal-cli`; if that is not available it can use this repository's Docker `signal-cli-rest-api` service.
+
+The CLI wrapper uses the current `signal-cli` account/output syntax (`-a ACCOUNT` and global `-o json`). Member exports are written atomically, identifiers are normalized across phone/UUID/ACI-style records, and invitation failures handle Signal exit codes for rate limits and CAPTCHA errors.
+
+`signal-cli` is not a Python package, so `pip install signal-cli` is intentionally not used.
