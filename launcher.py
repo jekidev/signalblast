@@ -93,8 +93,8 @@ def list_groups() -> int:
     return 0
 
 
-def scrape() -> int:
-    src = input("Kildegruppe (navn eller id): ").strip()
+def export_members() -> int:
+    src = input("Gruppe (navn eller id): ").strip()
     out = input("Output-fil [members.json]: ").strip() or "members.json"
     env = os.environ.copy()
     env["SIGNAL_NUMBER"] = account()
@@ -106,28 +106,13 @@ def scrape() -> int:
     ).returncode
 
 
-def invite() -> int:
+def review_invites() -> int:
     dst = input("Målgruppe-id: ").strip()
     members = input("Medlemsfil [members.json]: ").strip() or "members.json"
-    delay = input("Delay sekunder [15]: ").strip() or "15"
     env = os.environ.copy()
     env["SIGNAL_NUMBER"] = account()
     return subprocess.run(
-        [sys.executable, str(TOOLS / "signal_group_invite.py"), dst, members, delay],
-        cwd=ROOT,
-        env=env,
-        check=False,
-    ).returncode
-
-
-def pipeline() -> int:
-    src = input("Kildegruppe (navn eller id): ").strip()
-    dst = input("Målgruppe-id: ").strip()
-    delay = input("Delay sekunder [15]: ").strip() or "15"
-    env = os.environ.copy()
-    env["SIGNAL_NUMBER"] = account()
-    return subprocess.run(
-        ["bash", str(TOOLS / "signal_group_pipeline.sh"), src, dst, delay],
+        [sys.executable, str(TOOLS / "signal_group_invite.py"), dst, members],
         cwd=ROOT,
         env=env,
         check=False,
@@ -153,11 +138,10 @@ def menu() -> int:
         "1": ("Doctor / diagnostics", doctor),
         "2": ("Bootstrap / auto-setup", bootstrap),
         "3": ("List Signal-grupper", list_groups),
-        "4": ("Scrape/eksporter gruppemedlemmer", scrape),
-        "5": ("Inviter fra JSON-liste", invite),
-        "6": ("Kør scrape -> invite pipeline", pipeline),
-        "7": ("Start Signalblast bot", start_bot),
-        "8": ("Følg Signalblast logs", logs),
+        "4": ("Eksporter medlemsoversigt", export_members),
+        "5": ("Review og inviter valgte modtagere", review_invites),
+        "6": ("Start Signalblast bot", start_bot),
+        "7": ("Følg Signalblast logs", logs),
     }
 
     while True:
@@ -182,7 +166,7 @@ def main() -> int:
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["menu", "doctor", "bootstrap", "groups", "scrape", "invite", "pipeline", "start", "logs"],
+        choices=["menu", "doctor", "bootstrap", "groups", "export", "invite", "start", "logs"],
         default="menu",
     )
     args = parser.parse_args()
@@ -191,9 +175,8 @@ def main() -> int:
         "doctor": doctor,
         "bootstrap": bootstrap,
         "groups": list_groups,
-        "scrape": scrape,
-        "invite": invite,
-        "pipeline": pipeline,
+        "export": export_members,
+        "invite": review_invites,
         "start": start_bot,
         "logs": logs,
     }
